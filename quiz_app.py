@@ -27,7 +27,7 @@ current_question = st.session_state.quiz[current_index]
 # -------------------------------
 title_col, restart_col = st.columns([4, 1])
 with title_col:
-    st.title("🧩 Mission CCDAK Quiz")
+    st.title("🧩 Test your knowledge !!")
     st.caption(" A random 30 question")
 with restart_col:
     if st.button("🔁 Restart Quiz"):
