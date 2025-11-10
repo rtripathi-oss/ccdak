@@ -28,7 +28,7 @@ current_question = st.session_state.quiz[current_index]
 title_col, restart_col = st.columns([4, 1])
 with title_col:
     st.title("🧩 Test your knowledge !!")
-    st.caption(" A random 30 question")
+    st.caption(" Total 350 Questions. Random set of 30 question on every start")
 with restart_col:
     if st.button("🔁 Restart Quiz"):
         st.session_state.quiz = random.sample(all_questions, 30)
