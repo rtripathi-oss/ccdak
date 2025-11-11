@@ -28,7 +28,7 @@ current_question = st.session_state.quiz[current_index]
 title_col, restart_col = st.columns([4, 1])
 with title_col:
     st.title("🧩 Test your knowledge !!")
-    st.caption(" Total 350 Questions. Random set of 30 question on every start")
+    st.caption("Total 350 Questions. Random set of 30 questions on every start.")
 with restart_col:
     if st.button("🔁 Restart Quiz"):
         st.session_state.quiz = random.sample(all_questions, 30)
@@ -146,3 +146,14 @@ if st.session_state.submitted:
         st.markdown("---")
 
     st.markdown(f"## 🏆 Final Score: {score} / {total_questions}")
+
+# -------------------------------
+# Footer
+# -------------------------------
+st.markdown("""
+<hr style='border:1px solid #ddd;margin-top:40px;margin-bottom:10px;'>
+
+<div style='text-align:center; color:gray; font-size: 14px;'>
+    Designed and Developed by <b>Rakesh Tripathi</b> 🚀
+</div>
+""", unsafe_allow_html=True)
