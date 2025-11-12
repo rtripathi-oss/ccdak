@@ -1,5 +1,8 @@
 import streamlit as st
 import random
+import time
+from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
 from questions.questions_set1 import questions_set1
 from questions.questions_set2 import questions_set2
 
@@ -10,177 +13,257 @@ all_questions = questions_set1 + questions_set2
 # Initialize session state
 # -------------------------------
 if "quiz" not in st.session_state:
-    st.session_state.quiz = random.sample(all_questions, 30)
+    st.session_state.quiz = random.sample(all_questions, 60)
     st.session_state.current_q = 0
-    st.session_state.answers = {}          # answers[i] = scalar (single) OR list (multi)
-    st.session_state.answered = {}         # answered flags per question
-    st.session_state.correct_count = 0     # number of correct questions
+    st.session_state.answers = {}
+    st.session_state.answered = {}
+    st.session_state.correct_count = 0
     st.session_state.submitted = False
+
+# Exam control variables
+if "exam_started" not in st.session_state:
+    st.session_state.exam_started = False
+if "start_time" not in st.session_state:
+    st.session_state.start_time = None
 
 # Helper variables
 total_questions = len(st.session_state.quiz)
-current_index = st.session_state.current_q
-current_question = st.session_state.quiz[current_index]
 
+# -------------------------------
+# Function: multi vs single
+# -------------------------------
 def is_multi_answer(q):
-    # Treat as multi-answer when "answer" is a list (or tuple)
     return isinstance(q.get("answer"), (list, tuple))
 
 # -------------------------------
-# Header + Restart button
+# Start Exam Page
 # -------------------------------
-title_col, restart_col = st.columns([4, 1])
+if not st.session_state.exam_started and not st.session_state.submitted:
+    st.title("🧠 Kafka Practice Exam")
+    st.markdown("""
+    - ⏰ **Duration:** 90 minutes  
+    - 🧩 **Questions:** 60 random  
+    - ⚠️ Once started, the timer cannot be paused.  
+    """)
+    if st.button("🚀 Start Exam"):
+        st.session_state.exam_started = True
+        st.session_state.start_time = time.time()
+        st.rerun()
+    st.stop()
+
+# -------------------------------
+# Timer + Header
+# -------------------------------
+title_col, restart_col = st.columns([5, 1.5])
+
 with title_col:
     st.title("🧩 Test your knowledge !!")
-    st.caption("Total 350 Questions. Random set of 30 questions on every start")
+    st.caption("Total 350 Questions. Random set of 60 questions on every start")
+
+# -------------------------------
+# Sidebar Timer (centered + bold)
+# -------------------------------
+# -------------------------------
+# Sidebar Timer (centered both ways)
+# -------------------------------
+with st.sidebar:
+    # Use custom HTML & CSS to center content vertically and horizontally
+    st.markdown(
+        """
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        ">
+            <h2 style="margin-bottom: 10px;">⏳ Time Remaining</h2>
+        """,
+        unsafe_allow_html=True
+    )
+
+    if st.session_state.exam_started and st.session_state.start_time:
+        elapsed = time.time() - st.session_state.start_time
+        remaining = max(0, 90  * 60 - int(elapsed))  # 1 minute for testing
+        minutes, seconds = divmod(remaining, 60)
+
+        # Bold, big timer display
+        st.markdown(
+            f"""
+            <div style="
+                font-size: 56px;
+                font-weight: 900;
+                color: #FF4B4B;
+                margin: 0;
+                text-align: center;
+            ">
+                {minutes:02d}:{seconds:02d}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # Auto-submit when time runs out
+        if remaining <= 0:
+            st.session_state.submitted = True
+            st.session_state.exam_started = False
+            st.warning("⏰ Time’s up! Submitting your answers...")
+            st.rerun()
+
+
 with restart_col:
     if st.button("🔁 Restart Quiz"):
-        st.session_state.quiz = random.sample(all_questions, 30)
-        st.session_state.current_q = 0
-        st.session_state.answers = {}
-        st.session_state.answered = {}
-        st.session_state.correct_count = 0
-        st.session_state.submitted = False
+        st.session_state.clear()
         st.rerun()
 
-# -------------------------------
-# Progress section
-# -------------------------------
-answered_count = len(st.session_state.answered)
-progress = answered_count / total_questions if total_questions else 0
-st.markdown(f"### Progress: {answered_count} / {total_questions} answered")
-st.progress(progress)
-
-if answered_count > 0:
-    st.markdown(f"**Current Score:** {st.session_state.correct_count} / {answered_count} ✅")
-
-st.divider()
+# Auto-refresh every second for live countdown
+st_autorefresh(interval=1000, key="timer_refresh")
 
 # -------------------------------
-# Display current question
+# Prevent answering after submission
 # -------------------------------
-st.markdown(f"### Q{current_index + 1}. {current_question['question']}")
+if st.session_state.submitted:
+    st.warning("Exam is over. Review your results below.")
+    st.header(f"🏆 Final Score: {st.session_state.correct_count} / {total_questions}")
 
-multi = is_multi_answer(current_question)
-options = current_question["options"]
+else:
+    # -------------------------------
+    # Progress section
+    # -------------------------------
+    answered_count = len(st.session_state.answered)
+    progress = answered_count / total_questions if total_questions else 0
+    st.markdown(f"### Progress: {answered_count} / {total_questions} answered")
+    st.progress(progress)
 
-# Prepare default/previous selection
-prev = st.session_state.answers.get(current_index, None)
+    if answered_count > 0:
+        st.markdown(f"**Current Score:** {st.session_state.correct_count} / {answered_count} ✅")
+
+    st.divider()
+
+    # -------------------------------
+    # Display current question
+    # -------------------------------
+    current_index = st.session_state.current_q
+    current_question = st.session_state.quiz[current_index]
+
+    st.markdown(f"### Q{current_index + 1}. {current_question['question']}")
+
+    multi = is_multi_answer(current_question)
+    options = current_question["options"]
+
+    # Prepare default/previous selection
+    prev = st.session_state.answers.get(current_index, None)
+
+    answered = current_index in st.session_state.answered  # check if question already submitted
 
 if multi:
-    # For multi-answer, use multiselect; store as a list
-    if prev is None:
-        default_selection = []
-    else:
-        # ensure list for default
-        default_selection = list(prev) if isinstance(prev, (list, tuple)) else ([prev] if prev else [])
+    default_selection = list(prev) if prev else []
     selected = st.multiselect(
         "Choose all that apply:",
         options,
         default=default_selection,
         key=f"q{current_index}_multi",
+        disabled=answered,  # 🔒 disable if answered
     )
-    # Save selected answers as list
-    st.session_state.answers[current_index] = selected
+    if not answered:
+        st.session_state.answers[current_index] = selected
 else:
-    # For single-answer, use radio; store as scalar
-    if prev is None:
-        default_index = 0
-    else:
-        try:
-            default_index = options.index(prev)
-        except ValueError:
-            default_index = 0
+    default_index = options.index(prev) if prev in options else 0
     selected = st.radio(
         "Choose your answer:",
         options,
         index=default_index,
         key=f"q{current_index}_single",
+        disabled=answered,  # 🔒 disable if answered
     )
-    # Save selected answer as scalar
-    st.session_state.answers[current_index] = selected
+    if not answered:
+        st.session_state.answers[current_index] = selected
 
-# -------------------------------
-# Submit button per question
-# -------------------------------
-if st.button("✅ Submit this question"):
-    if current_index not in st.session_state.answered:
-        st.session_state.answered[current_index] = True
 
+    # -------------------------------
+    # Submit button per question
+    # -------------------------------
+    if st.button("✅ Submit this question"):
+        if current_index not in st.session_state.answered:
+            st.session_state.answered[current_index] = True
+
+            correct = current_question["answer"]
+            user_ans = st.session_state.answers[current_index]
+
+            if multi:
+                correct_set = set(correct)
+                user_set = set(user_ans)
+                if user_set == correct_set:
+                    st.success(f"✅ Correct! — {', '.join(correct)}")
+                    st.session_state.correct_count += 1
+                else:
+                    st.error("❌ Incorrect.")
+                    st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
+                    st.info(f"💡 Correct answer: **{', '.join(correct)}**")
+            else:
+                if user_ans == correct:
+                    st.success(f"✅ Correct! — {correct}")
+                    st.session_state.correct_count += 1
+                else:
+                    st.error(f"❌ Incorrect. Your answer: **{user_ans}**")
+                    st.info(f"💡 Correct answer: **{correct}**")
+
+            if "explanation" in current_question and current_question["explanation"]:
+                st.markdown(f"**Explanation:** {current_question['explanation']}")
+
+            st.rerun()
+
+    # -------------------------------
+    # Show answer if already submitted
+    # -------------------------------
+    if current_index in st.session_state.answered:
         correct = current_question["answer"]
-        user_ans = st.session_state.answers[current_index]
+        user_ans = st.session_state.answers.get(current_index, [] if multi else None)
 
         if multi:
-            # Compare as sets for exact match
-            correct_set = set(correct)
-            user_set = set(user_ans)
-            if user_set == correct_set:
+            if set(user_ans) == set(correct):
                 st.success(f"✅ Correct! — {', '.join(correct)}")
-                st.session_state.correct_count += 1
             else:
-                st.error(f"❌ Incorrect.")
+                st.error("❌ Incorrect.")
                 st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
                 st.info(f"💡 Correct answer: **{', '.join(correct)}**")
         else:
             if user_ans == correct:
                 st.success(f"✅ Correct! — {correct}")
-                st.session_state.correct_count += 1
             else:
                 st.error(f"❌ Incorrect. Your answer: **{user_ans}**")
                 st.info(f"💡 Correct answer: **{correct}**")
 
-        # Explanation (if present)
         if "explanation" in current_question and current_question["explanation"]:
             st.markdown(f"**Explanation:** {current_question['explanation']}")
 
-        st.rerun()
+    st.divider()
 
-# Show answer if already submitted
-if current_index in st.session_state.answered:
-    correct = current_question["answer"]
-    user_ans = st.session_state.answers.get(current_index, [] if multi else None)
+    # -------------------------------
+    # Navigation buttons
+    # -------------------------------
+    nav1, nav2, nav3 = st.columns([1, 1, 1])
 
-    if multi:
-        if set(user_ans) == set(correct):
-            st.success(f"✅ Correct! — {', '.join(correct)}")
-        else:
-            st.error("❌ Incorrect.")
-            st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
-            st.info(f"💡 Correct answer: **{', '.join(correct)}**")
-    else:
-        if user_ans == correct:
-            st.success(f"✅ Correct! — {correct}")
-        else:
-            st.error(f"❌ Incorrect. Your answer: **{user_ans}**")
-            st.info(f"💡 Correct answer: **{correct}**")
+    with nav1:
+        if st.session_state.current_q > 0:
+            if st.button("⬅️ Previous"):
+                st.session_state.current_q -= 1
+                st.rerun()
 
-    if "explanation" in current_question and current_question["explanation"]:
-        st.markdown(f"**Explanation:** {current_question['explanation']}")
+    with nav2:
+        if st.session_state.current_q < total_questions - 1:
+            if st.button("Next ➡️"):
+                st.session_state.current_q += 1
+                st.rerun()
 
-st.divider()
-
-# -------------------------------
-# Navigation buttons
-# -------------------------------
-nav1, nav2, nav3 = st.columns([1, 1, 1])
-
-with nav1:
-    if st.session_state.current_q > 0:
-        if st.button("⬅️ Previous"):
-            st.session_state.current_q -= 1
-            st.rerun()
-
-with nav2:
-    if st.session_state.current_q < total_questions - 1:
-        if st.button("Next ➡️"):
-            st.session_state.current_q += 1
-            st.rerun()
-
-with nav3:
-    if answered_count == total_questions:
-        if st.button("🏁 Finish Quiz"):
-            st.session_state.submitted = True
-            st.rerun()
+    with nav3:
+        if answered_count == total_questions:
+            if st.button("🏁 Finish Quiz"):
+                st.session_state.submitted = True
+                st.session_state.exam_started = False
+                st.rerun()
 
 # -------------------------------
 # Final results
@@ -216,4 +299,3 @@ if st.session_state.submitted:
 
         st.markdown("---")
 
-    st.markdown(f"## 🏆 Final Score: {score} / {total_questions}")
