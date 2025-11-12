@@ -303,7 +303,7 @@ questions_set1 = [
     {
         "question": "With the Round Robin Assignor, which consumer(s) will be assigned partition 2 from topic T1 (C1, C2, C3, C4 consuming T1 with 3 partitions and T2 with 2 partitions)?",
         "options": ["C1", "C2", "C3", "C4"],
-        "answer": ["C"],
+        "answer": "C",
         "explanation": (
             "The Round Robin Assignor assigns partitions sequentially. "
             "C3 gets T1-2, so partition 2 of T1 is assigned to C3."
@@ -331,7 +331,7 @@ questions_set1 = [
             "Shut down the application",
             "Ignore and continue"
         ],
-        "answer": ["Reset to the earliest offset and retry"],
+        "answer": "Reset to the earliest offset and retry",
         "explanation": (
             "The correct way is to reset the offset to the earliest available and retry. "
             "The error means the app tried to read from a deleted offset."
@@ -345,7 +345,7 @@ questions_set1 = [
             "key.deserializer=StringDeserializer",
             "value.deserializer=StringDeserializer"
         ],
-        "answer": ["value.deserializer=JsonDeserializer"],
+        "answer": "value.deserializer=JsonDeserializer",
         "explanation": (
             "Since the values are JSON, you must set `value.deserializer=JsonDeserializer`."
         ),
@@ -358,7 +358,7 @@ questions_set1 = [
             "KafkaConsumer.subscribe(Collection<TopicPartition> partitions)",
             "KafkaConsumer.assign(String topic, int partition)"
         ],
-        "answer": ["KafkaConsumer.assign(Collection<TopicPartition> partitions)"],
+        "answer": "KafkaConsumer.assign(Collection<TopicPartition> partitions)",
         "explanation": (
             "Use `assign()` to directly specify the partitions a consumer should read from."
         ),
@@ -371,7 +371,7 @@ questions_set1 = [
             "It creates the partition automatically",
             "It waits for the partition to be created"
         ],
-        "answer": ["It throws an exception and stops"],
+        "answer": "It throws an exception and stops",
         "explanation": (
             "Kafka will throw `UnknownTopicOrPartitionException` when a partition doesn’t exist."
         ),
@@ -384,7 +384,7 @@ questions_set1 = [
             "No, only at startup",
             "No, assignment is fixed"
         ],
-        "answer": ["Yes, with assign()"],
+        "answer": "Yes, with assign()",
         "explanation": (
             "Calling `assign()` again with a new list of partitions changes assignment dynamically."
         ),
@@ -397,7 +397,7 @@ questions_set1 = [
             "It starts from the latest offset",
             "It gets a new set of partitions"
         ],
-        "answer": ["It resumes from the last committed offset"],
+        "answer": "It resumes from the last committed offset",
         "explanation": (
             "When a consumer restarts, it resumes from the last committed offset for each partition."
         ),
@@ -411,7 +411,7 @@ questions_set1 = [
     {
         "question": "In a Kafka cluster, you have a topic with 6 partitions and a replication factor of 3. How many replicas of each partition will be spread across the brokers?",
         "options": ["1", "2", "3", "6"],
-        "answer": ["3"],
+        "answer": "3",
         "explanation": "Replication factor determines copies per partition; here, 3 replicas per partition."
     },
     {
@@ -423,55 +423,55 @@ questions_set1 = [
     {
         "question": "What is the purpose of the `group.id` property in a Kafka consumer configuration?",
         "options": ["ID of consumer", "ID of consumer group", "ID of cluster", "ID of partitions"],
-        "answer": ["ID of consumer group"],
+        "answer": "ID of consumer group",
         "explanation": "`group.id` identifies which group the consumer belongs to."
     },
     {
         "question": "What is the default behavior of the auto.offset.reset configuration in Kafka consumers?",
         "options": ["Starts from earliest", "Starts from latest", "Throws exception", "Waits for committed offset"],
-        "answer": ["Throws exception"],
+        "answer": "Throws exception",
         "explanation": "If no committed offset found, by default Kafka throws an exception."
     },
     {
         "question": "When enable.auto.commit is false, what happens when commitSync() is called?",
         "options": ["Commits processed messages", "Commits fetched but unprocessed", "Throws exception", "Waits for next batch"],
-        "answer": ["Commits processed messages"],
+        "answer": "Commits processed messages",
         "explanation": "`commitSync()` manually commits offsets of processed messages."
     },
     {
         "question": "What is the purpose of the isolation.level configuration in Kafka consumers?",
         "options": ["Control visibility of transactional messages", "Max records per batch", "Behavior on partition reassignment", "Consistency level"],
-        "answer": ["Control visibility of transactional messages"],
+        "answer": "Control visibility of transactional messages",
         "explanation": "`isolation.level` controls visibility of transactional messages (read_committed vs read_uncommitted)."
     },
     {
         "question": "What happens if poll() is called on a KafkaConsumer from multiple threads?",
         "options": ["Parallel processing", "Throws ConcurrentModificationException", "Undefined behavior", "Sequential by turn"],
-        "answer": ["Undefined behavior"],
+        "answer": "Undefined behavior",
         "explanation": "KafkaConsumer is not thread-safe; calling poll() from multiple threads can corrupt state."
     },
     {
         "question": "What is the recommended approach to process messages concurrently using KafkaConsumer?",
         "options": ["Share single consumer", "Multiple consumers in separate threads", "Thread pool on one consumer", "Synchronize shared consumer"],
-        "answer": ["Multiple consumers in separate threads"],
+        "answer": "Multiple consumers in separate threads",
         "explanation": "Use one KafkaConsumer per thread to ensure thread safety and parallelism."
     },
     {
         "question": "How does Kafka ensure messages are processed in a balanced way with multiple consumers?",
         "options": ["Equal messages", "Round-robin partition assignment", "Adjusts dynamically by load", "Uses ZooKeeper to balance"],
-        "answer": ["Round-robin partition assignment"],
+        "answer": "Round-robin partition assignment",
         "explanation": "Kafka balances partitions among consumers using round-robin assignor by default."
     },
     {
         "question": "What is the primary benefit of Kafka's zero-copy optimization?",
         "options": ["Reduces memory overhead", "Removes serialization", "Improves security", "Increases parallelism"],
-        "answer": ["Reduces memory overhead"],
+        "answer": "Reduces memory overhead",
         "explanation": "Zero-copy minimizes memory duplication by transferring data directly from disk to network buffer."
     },
     {
         "question": "What is the purpose of the `isolation.level` setting in the Kafka consumer configuration?",
         "options": ["Max records", "Visibility of transactional messages", "Offset behavior", "Wait timeout"],
-        "answer": ["Visibility of transactional messages"],
+        "answer": "Visibility of transactional messages",
         "explanation": "Controls whether the consumer reads committed messages only or all messages."
     },
     {
