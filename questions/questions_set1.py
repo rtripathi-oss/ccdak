@@ -274,13 +274,13 @@ questions_set1 = [
     {
         "question": "Which of the following is stored in the Kafka `__consumer_offsets` topic? (Select two)",
         "options": [
-            "A. The latest committed offset for each consumer group",
-            "B. The list of consumers in each consumer group",
-            "C. The mapping of partitions to consumer groups",
-            "D. The last produced message for each topic partition",
-            "E. The earliest committed offset for each consumer group"
+            "The latest committed offset for each consumer group",
+            "The list of consumers in each consumer group",
+            "The mapping of partitions to consumer groups",
+            "The last produced message for each topic partition",
+            "The earliest committed offset for each consumer group"
         ],
-        "answer": ["A", "C"],
+        "answer": ["The latest committed offset for each consumer group", "The mapping of partitions to consumer groups"],
         "explanation": (
             "The `__consumer_offsets` topic stores:\n\n"
             "- The latest committed offset for each consumer group (A)\n"
@@ -292,17 +292,17 @@ questions_set1 = [
     {
         "question": "There are two consumers C1 and C2 belonging to the same group G subscribed to topics T1, T2, and T3. Each topic has 4 partitions. Assuming all partitions have data, how many partitions will each consumer be assigned with the Range Assignor?",
         "options": [
-            "A. C1: 6 partitions, C2: 6 partitions",
-            "B. C1: 4 partitions, C2: 8 partitions",
-            "C. C1: 2 partitions from each topic, C2: 2 partitions from each topic",
-            "D. C1: 1 partition from each topic, C2: 3 partitions from each topic"
+            "C1: 6 partitions, C2: 6 partitions",
+            "C1: 4 partitions, C2: 8 partitions",
+            "C1: 2 partitions from each topic, C2: 2 partitions from each topic",
+            "C1: 1 partition from each topic, C2: 3 partitions from each topic"
         ],
-        "answer": ["A"],
+        "answer": ["C1: 6 partitions, C2: 6 partitions"],
         "explanation": "With the Range Assignor, each consumer will be assigned a contiguous range of partitions from each topic. Each gets 2 partitions from each topic, totaling 6 each.",
     },
     {
         "question": "With the Round Robin Assignor, which consumer(s) will be assigned partition 2 from topic T1 (C1, C2, C3, C4 consuming T1 with 3 partitions and T2 with 2 partitions)?",
-        "options": ["A. C1", "B. C2", "C. C3", "D. C4"],
+        "options": ["C1", "C2", "C3", "C4"],
         "answer": ["C"],
         "explanation": (
             "The Round Robin Assignor assigns partitions sequentially. "
@@ -312,12 +312,12 @@ questions_set1 = [
     {
         "question": "There are three consumers C1, C2, C3 in group G consuming topic T with 10 partitions. Using the Sticky Assignor, if C1 leaves, how will partitions be rebalanced?",
         "options": [
-            "A. All partitions will be reassigned evenly among C2 and C3",
-            "B. C2 and C3 will retain existing partitions, and C1's will be reassigned",
-            "C. All partitions will be reassigned randomly",
-            "D. Partitions from C1 will not be reassigned"
+            "All partitions will be reassigned evenly among C2 and C3",
+            "C2 and C3 will retain existing partitions, and C1's will be reassigned",
+            "All partitions will be reassigned randomly",
+            "Partitions from C1 will not be reassigned"
         ],
-        "answer": ["B"],
+        "answer": ["C2 and C3 will retain existing partitions, and C1's will be reassigned"],
         "explanation": (
             "The Sticky Assignor minimizes partition movement, so C2 and C3 keep their partitions, "
             "and only C1’s partitions are reassigned."
@@ -326,12 +326,12 @@ questions_set1 = [
     {
         "question": "A Kafka Streams app receives 'Offset Out Of Range' error. How should it handle this?",
         "options": [
-            "A. Reset to the earliest offset and retry",
-            "B. Reset to the latest offset and retry",
-            "C. Shut down the application",
-            "D. Ignore and continue"
+            "Reset to the earliest offset and retry",
+            "Reset to the latest offset and retry",
+            "Shut down the application",
+            "Ignore and continue"
         ],
-        "answer": ["A"],
+        "answer": ["Reset to the earliest offset and retry"],
         "explanation": (
             "The correct way is to reset the offset to the earliest available and retry. "
             "The error means the app tried to read from a deleted offset."
@@ -340,12 +340,12 @@ questions_set1 = [
     {
         "question": "You are consuming JSON messages from a Kafka topic. Which consumer property should you set?",
         "options": [
-            "A. key.deserializer=JsonDeserializer",
-            "B. value.deserializer=JsonDeserializer",
-            "C. key.deserializer=StringDeserializer",
-            "D. value.deserializer=StringDeserializer"
+            "key.deserializer=JsonDeserializer",
+            "value.deserializer=JsonDeserializer",
+            "key.deserializer=StringDeserializer",
+            "value.deserializer=StringDeserializer"
         ],
-        "answer": ["B"],
+        "answer": ["value.deserializer=JsonDeserializer"],
         "explanation": (
             "Since the values are JSON, you must set `value.deserializer=JsonDeserializer`."
         ),
@@ -353,12 +353,12 @@ questions_set1 = [
     {
         "question": "A consumer wants to read messages from a specific partition. Which method should be used?",
         "options": [
-            "A. KafkaConsumer.subscribe(String topic, int partition)",
-            "B. KafkaConsumer.assign(Collection<TopicPartition> partitions)",
-            "C. KafkaConsumer.subscribe(Collection<TopicPartition> partitions)",
-            "D. KafkaConsumer.assign(String topic, int partition)"
+            "KafkaConsumer.subscribe(String topic, int partition)",
+            "KafkaConsumer.assign(Collection<TopicPartition> partitions)",
+            "KafkaConsumer.subscribe(Collection<TopicPartition> partitions)",
+            "KafkaConsumer.assign(String topic, int partition)"
         ],
-        "answer": ["B"],
+        "answer": ["KafkaConsumer.assign(Collection<TopicPartition> partitions)"],
         "explanation": (
             "Use `assign()` to directly specify the partitions a consumer should read from."
         ),
@@ -366,12 +366,12 @@ questions_set1 = [
     {
         "question": "What happens when a consumer is assigned a non-existent partition?",
         "options": [
-            "A. It ignores it and continues",
-            "B. It throws an exception and stops",
-            "C. It creates the partition automatically",
-            "D. It waits for the partition to be created"
+            "It ignores it and continues",
+            "It throws an exception and stops",
+            "It creates the partition automatically",
+            "It waits for the partition to be created"
         ],
-        "answer": ["B"],
+        "answer": ["It throws an exception and stops"],
         "explanation": (
             "Kafka will throw `UnknownTopicOrPartitionException` when a partition doesn’t exist."
         ),
@@ -379,12 +379,12 @@ questions_set1 = [
     {
         "question": "Can a consumer dynamically change its partitions without restarting?",
         "options": [
-            "A. Yes, with subscribe()",
-            "B. Yes, with assign()",
-            "C. No, only at startup",
-            "D. No, assignment is fixed"
+            "Yes, with subscribe()",
+            "Yes, with assign()",
+            "No, only at startup",
+            "No, assignment is fixed"
         ],
-        "answer": ["B"],
+        "answer": ["Yes, with assign()"],
         "explanation": (
             "Calling `assign()` again with a new list of partitions changes assignment dynamically."
         ),
@@ -392,86 +392,86 @@ questions_set1 = [
     {
         "question": "A consumer crashes and restarts. What happens next?",
         "options": [
-            "A. It resumes from the last committed offset",
-            "B. It starts from the earliest offset",
-            "C. It starts from the latest offset",
-            "D. It gets a new set of partitions"
+            "It resumes from the last committed offset",
+            "It starts from the earliest offset",
+            "It starts from the latest offset",
+            "It gets a new set of partitions"
         ],
-        "answer": ["A"],
+        "answer": ["It resumes from the last committed offset"],
         "explanation": (
             "When a consumer restarts, it resumes from the last committed offset for each partition."
         ),
     },
     {
         "question": "Which of the following is stored in Zookeeper for a Kafka cluster? (Select two)",
-        "options": ["A. Consumer offsets", "B. Kafka broker information", "C. Topic partition assignments", "D. Topic-level configurations", "E. Producer client IDs"],
-        "answer": ["B. Kafka broker information", "D. Topic-level configurations"],
+        "options": ["Consumer offsets", "Kafka broker information", "Topic partition assignments", "Topic-level configurations", "Producer client IDs"],
+        "answer": ["Kafka broker information", "Topic-level configurations"],
         "explanation": "Zookeeper stores broker info and topic-level configs; consumer offsets are stored in Kafka itself."
     },
     {
         "question": "In a Kafka cluster, you have a topic with 6 partitions and a replication factor of 3. How many replicas of each partition will be spread across the brokers?",
-        "options": ["A. 1", "B. 2", "C. 3", "D. 6"],
-        "answer": ["C. 3"],
+        "options": ["1", "2", "3", "6"],
+        "answer": ["3"],
         "explanation": "Replication factor determines copies per partition; here, 3 replicas per partition."
     },
     {
         "question": "What happens when a new consumer joins an existing consumer group?",
-        "options": ["A. Starts from earliest offset", "B. Starts from latest offset", "C. Assigned subset of partitions, consuming from last committed offset", "D. Waits for next rebalance"],
-        "answer": ["C. Assigned subset of partitions, consuming from last committed offset"],
+        "options": ["Starts from earliest offset", "Starts from latest offset", "Assigned subset of partitions, consuming from last committed offset", "Waits for next rebalance"],
+        "answer": ["Assigned subset of partitions, consuming from last committed offset"],
         "explanation": "Joining triggers a rebalance; consumer starts from last committed offsets."
     },
     {
         "question": "What is the purpose of the `group.id` property in a Kafka consumer configuration?",
-        "options": ["A. ID of consumer", "B. ID of consumer group", "C. ID of cluster", "D. ID of partitions"],
-        "answer": ["B. ID of consumer group"],
+        "options": ["ID of consumer", "ID of consumer group", "ID of cluster", "ID of partitions"],
+        "answer": ["ID of consumer group"],
         "explanation": "`group.id` identifies which group the consumer belongs to."
     },
     {
         "question": "What is the default behavior of the auto.offset.reset configuration in Kafka consumers?",
-        "options": ["A. Starts from earliest", "B. Starts from latest", "C. Throws exception", "D. Waits for committed offset"],
-        "answer": ["C. Throws exception"],
+        "options": ["Starts from earliest", "Starts from latest", "Throws exception", "Waits for committed offset"],
+        "answer": ["Throws exception"],
         "explanation": "If no committed offset found, by default Kafka throws an exception."
     },
     {
         "question": "When enable.auto.commit is false, what happens when commitSync() is called?",
-        "options": ["A. Commits processed messages", "B. Commits fetched but unprocessed", "C. Throws exception", "D. Waits for next batch"],
-        "answer": ["A. Commits processed messages"],
+        "options": ["Commits processed messages", "Commits fetched but unprocessed", "Throws exception", "Waits for next batch"],
+        "answer": ["Commits processed messages"],
         "explanation": "`commitSync()` manually commits offsets of processed messages."
     },
     {
         "question": "What is the purpose of the isolation.level configuration in Kafka consumers?",
-        "options": ["A. Control visibility of transactional messages", "B. Max records per batch", "C. Behavior on partition reassignment", "D. Consistency level"],
-        "answer": ["A. Control visibility of transactional messages"],
+        "options": ["Control visibility of transactional messages", "Max records per batch", "Behavior on partition reassignment", "Consistency level"],
+        "answer": ["Control visibility of transactional messages"],
         "explanation": "`isolation.level` controls visibility of transactional messages (read_committed vs read_uncommitted)."
     },
     {
         "question": "What happens if poll() is called on a KafkaConsumer from multiple threads?",
-        "options": ["A. Parallel processing", "B. Throws ConcurrentModificationException", "C. Undefined behavior", "D. Sequential by turn"],
-        "answer": ["C. Undefined behavior"],
+        "options": ["Parallel processing", "Throws ConcurrentModificationException", "Undefined behavior", "Sequential by turn"],
+        "answer": ["Undefined behavior"],
         "explanation": "KafkaConsumer is not thread-safe; calling poll() from multiple threads can corrupt state."
     },
     {
         "question": "What is the recommended approach to process messages concurrently using KafkaConsumer?",
-        "options": ["A. Share single consumer", "B. Multiple consumers in separate threads", "C. Thread pool on one consumer", "D. Synchronize shared consumer"],
-        "answer": ["B. Multiple consumers in separate threads"],
+        "options": ["Share single consumer", "Multiple consumers in separate threads", "Thread pool on one consumer", "Synchronize shared consumer"],
+        "answer": ["Multiple consumers in separate threads"],
         "explanation": "Use one KafkaConsumer per thread to ensure thread safety and parallelism."
     },
     {
         "question": "How does Kafka ensure messages are processed in a balanced way with multiple consumers?",
-        "options": ["A. Equal messages", "B. Round-robin partition assignment", "C. Adjusts dynamically by load", "D. Uses ZooKeeper to balance"],
-        "answer": ["B. Round-robin partition assignment"],
+        "options": ["Equal messages", "Round-robin partition assignment", "Adjusts dynamically by load", "Uses ZooKeeper to balance"],
+        "answer": ["Round-robin partition assignment"],
         "explanation": "Kafka balances partitions among consumers using round-robin assignor by default."
     },
     {
         "question": "What is the primary benefit of Kafka's zero-copy optimization?",
-        "options": ["A. Reduces memory overhead", "B. Removes serialization", "C. Improves security", "D. Increases parallelism"],
-        "answer": ["A. Reduces memory overhead"],
+        "options": ["Reduces memory overhead", "Removes serialization", "Improves security", "Increases parallelism"],
+        "answer": ["Reduces memory overhead"],
         "explanation": "Zero-copy minimizes memory duplication by transferring data directly from disk to network buffer."
     },
     {
         "question": "What is the purpose of the `isolation.level` setting in the Kafka consumer configuration?",
-        "options": ["A. Max records", "B. Visibility of transactional messages", "C. Offset behavior", "D. Wait timeout"],
-        "answer": ["B. Visibility of transactional messages"],
+        "options": ["Max records", "Visibility of transactional messages", "Offset behavior", "Wait timeout"],
+        "answer": ["Visibility of transactional messages"],
         "explanation": "Controls whether the consumer reads committed messages only or all messages."
     },
     {
