@@ -317,7 +317,7 @@ questions_set1 = [
             "All partitions will be reassigned randomly",
             "Partitions from C1 will not be reassigned"
         ],
-        "answer": ["C2 and C3 will retain existing partitions, and C1's will be reassigned"],
+        "answer": "C2 and C3 will retain existing partitions, and C1's will be reassigned",
         "explanation": (
             "The Sticky Assignor minimizes partition movement, so C2 and C3 keep their partitions, "
             "and only C1’s partitions are reassigned."
