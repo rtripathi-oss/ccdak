@@ -6,7 +6,9 @@ from streamlit_autorefresh import st_autorefresh
 from questions.questions_set1 import questions_set1
 from questions.questions_set2 import questions_set2
 
+# -------------------------------
 # Combine all question sets
+# -------------------------------
 all_questions = questions_set1 + questions_set2
 
 # -------------------------------
@@ -60,14 +62,15 @@ with title_col:
     st.title("🧩 Test your knowledge !!")
     st.caption("Total 350 Questions. Random set of 60 questions on every start")
 
-# -------------------------------
-# Sidebar Timer (centered + bold)
-# -------------------------------
+with restart_col:
+    if st.button("🔁 Restart Quiz"):
+        st.session_state.clear()
+        st.rerun()
+
 # -------------------------------
 # Sidebar Timer (centered both ways)
 # -------------------------------
 with st.sidebar:
-    # Use custom HTML & CSS to center content vertically and horizontally
     st.markdown(
         """
         <div style="
@@ -84,10 +87,9 @@ with st.sidebar:
 
     if st.session_state.exam_started and st.session_state.start_time:
         elapsed = time.time() - st.session_state.start_time
-        remaining = max(0, 90  * 60 - int(elapsed))  # 1 minute for testing
+        remaining = max(0, 90 * 60 - int(elapsed))
         minutes, seconds = divmod(remaining, 60)
 
-        # Bold, big timer display
         st.markdown(
             f"""
             <div style="
@@ -112,22 +114,15 @@ with st.sidebar:
             st.warning("⏰ Time’s up! Submitting your answers...")
             st.rerun()
 
-
-with restart_col:
-    if st.button("🔁 Restart Quiz"):
-        st.session_state.clear()
-        st.rerun()
-
 # Auto-refresh every second for live countdown
 st_autorefresh(interval=1000, key="timer_refresh")
 
 # -------------------------------
-# Prevent answering after submission
+# If exam submitted: Show results
 # -------------------------------
 if st.session_state.submitted:
     st.warning("Exam is over. Review your results below.")
     st.header(f"🏆 Final Score: {st.session_state.correct_count} / {total_questions}")
-
 else:
     # -------------------------------
     # Progress section
@@ -153,42 +148,44 @@ else:
     multi = is_multi_answer(current_question)
     options = current_question["options"]
 
-    # Prepare default/previous selection
     prev = st.session_state.answers.get(current_index, None)
-
-    answered = current_index in st.session_state.answered  # check if question already submitted
-
-if multi:
-    default_selection = list(prev) if prev else []
-    selected = st.multiselect(
-        "Choose all that apply:",
-        options,
-        default=default_selection,
-        key=f"q{current_index}_multi",
-        disabled=answered,  # 🔒 disable if answered
-    )
-    if not answered:
-        st.session_state.answers[current_index] = selected
-else:
-    default_index = options.index(prev) if prev in options else 0
-    selected = st.radio(
-        "Choose your answer:",
-        options,
-        index=default_index,
-        key=f"q{current_index}_single",
-        disabled=answered,  # 🔒 disable if answered
-    )
-    if not answered:
-        st.session_state.answers[current_index] = selected
-
+    answered = current_index in st.session_state.answered
 
     # -------------------------------
-    # Submit button per question
+    # Options
     # -------------------------------
-    if st.button("✅ Submit this question"):
-        if current_index not in st.session_state.answered:
+    if multi:
+        default_selection = list(prev) if prev else []
+        selected = st.multiselect(
+            "Choose all that apply:",
+            options,
+            default=default_selection,
+            key=f"q{current_index}_multi",
+            disabled=answered,
+        )
+    else:
+        default_index = options.index(prev) if prev in options else 0
+        selected = st.radio(
+            "Choose your answer:",
+            options,
+            index=default_index,
+            key=f"q{current_index}_single",
+            disabled=answered,
+        )
+
+    if not answered:
+        st.session_state.answers[current_index] = selected
+
+    st.divider()
+
+    # -------------------------------
+    # Buttons Section
+    # -------------------------------
+    col_submit, col_prev, col_next = st.columns([2, 1, 1])
+
+    with col_submit:
+        if not answered and st.button("✅ Submit this question", use_container_width=True):
             st.session_state.answered[current_index] = True
-
             correct = current_question["answer"]
             user_ans = st.session_state.answers[current_index]
 
@@ -215,10 +212,20 @@ else:
 
             st.rerun()
 
+    with col_prev:
+        if st.session_state.current_q > 0 and st.button("⬅️ Previous", use_container_width=True):
+            st.session_state.current_q -= 1
+            st.rerun()
+
+    with col_next:
+        if st.session_state.current_q < total_questions - 1 and st.button("Next ➡️", use_container_width=True):
+            st.session_state.current_q += 1
+            st.rerun()
+
     # -------------------------------
-    # Show answer if already submitted
+    # If answered: Show correct result
     # -------------------------------
-    if current_index in st.session_state.answered:
+    if answered:
         correct = current_question["answer"]
         user_ans = st.session_state.answers.get(current_index, [] if multi else None)
 
@@ -239,34 +246,18 @@ else:
         if "explanation" in current_question and current_question["explanation"]:
             st.markdown(f"**Explanation:** {current_question['explanation']}")
 
-    st.divider()
-
     # -------------------------------
-    # Navigation buttons
+    # Show Finish Button if all answered
     # -------------------------------
-    nav1, nav2, nav3 = st.columns([1, 1, 1])
-
-    with nav1:
-        if st.session_state.current_q > 0:
-            if st.button("⬅️ Previous"):
-                st.session_state.current_q -= 1
-                st.rerun()
-
-    with nav2:
-        if st.session_state.current_q < total_questions - 1:
-            if st.button("Next ➡️"):
-                st.session_state.current_q += 1
-                st.rerun()
-
-    with nav3:
-        if answered_count == total_questions:
-            if st.button("🏁 Finish Quiz"):
-                st.session_state.submitted = True
-                st.session_state.exam_started = False
-                st.rerun()
+    if answered_count == total_questions:
+        st.markdown("---")
+        if st.button("🏁 Finish Quiz", use_container_width=True):
+            st.session_state.submitted = True
+            st.session_state.exam_started = False
+            st.rerun()
 
 # -------------------------------
-# Final results
+# Final Results Section
 # -------------------------------
 if st.session_state.submitted:
     st.divider()
@@ -298,4 +289,3 @@ if st.session_state.submitted:
             st.info(f"💡 {q['explanation']}")
 
         st.markdown("---")
-
