@@ -36,9 +36,9 @@ def is_multi_answer(q):
 # Start Exam Page
 # -------------------------------
 if not st.session_state.exam_started and not st.session_state.submitted:
-    st.title("🧠 Kafka Practice Exam")
+    st.title("🧠 Kafka Learning !!")
     st.markdown("""
-    - 🧩 **Questions:** 60 random  
+    - 🧩 **Questions:** All questions
     - 🚀 Start when ready
     """)
     if st.button("Start Exam"):
