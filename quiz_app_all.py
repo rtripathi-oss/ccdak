@@ -41,7 +41,7 @@ if not st.session_state.exam_started and not st.session_state.submitted:
     - 🧩 **Questions:** All questions
     - 🚀 Start when ready
     """)
-    if st.button("Start Exam"):
+    if st.button("Go For It!"):
         st.session_state.exam_started = True
         st.rerun()
     st.stop()
