@@ -53,7 +53,7 @@ title_col, restart_col = st.columns([5, 1.5])
 
 with title_col:
     st.title("🧩 Test your knowledge !!")
-    st.caption("Total 350 Questions. Random set of 60 questions on every start")
+    st.caption("Total 350 Questions.")
 
 with restart_col:
     if st.button("🔁 Restart Quiz"):
