@@ -1,8 +1,5 @@
 import streamlit as st
 import random
-import time
-from datetime import datetime
-from streamlit_autorefresh import st_autorefresh
 from questions.questions_set1 import questions_set1
 from questions.questions_set2 import questions_set2
 
@@ -22,11 +19,9 @@ if "quiz" not in st.session_state:
     st.session_state.correct_count = 0
     st.session_state.submitted = False
 
-# Exam control variables
+# Exam control variable
 if "exam_started" not in st.session_state:
     st.session_state.exam_started = False
-if "start_time" not in st.session_state:
-    st.session_state.start_time = None
 
 # Helper variables
 total_questions = len(st.session_state.quiz)
@@ -43,18 +38,16 @@ def is_multi_answer(q):
 if not st.session_state.exam_started and not st.session_state.submitted:
     st.title("🧠 Kafka Practice Exam")
     st.markdown("""
-    - ⏰ **Duration:** 90 minutes  
     - 🧩 **Questions:** 60 random  
-    - ⚠️ Once started, the timer cannot be paused.  
+    - 🚀 Start when ready
     """)
-    if st.button("🚀 Start Exam"):
+    if st.button("Start Exam"):
         st.session_state.exam_started = True
-        st.session_state.start_time = time.time()
         st.rerun()
     st.stop()
 
 # -------------------------------
-# Timer + Header
+# Header
 # -------------------------------
 title_col, restart_col = st.columns([5, 1.5])
 
@@ -68,64 +61,15 @@ with restart_col:
         st.rerun()
 
 # -------------------------------
-# Sidebar Timer (centered both ways)
-# -------------------------------
-with st.sidebar:
-    st.markdown(
-        """
-        <div style="
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        ">
-            <h2 style="margin-bottom: 10px;">⏳ Time Remaining</h2>
-        """,
-        unsafe_allow_html=True
-    )
-
-    if st.session_state.exam_started and st.session_state.start_time:
-        elapsed = time.time() - st.session_state.start_time
-        remaining = max(0, 900 * 60 - int(elapsed))
-        minutes, seconds = divmod(remaining, 350)
-
-        st.markdown(
-            f"""
-            <div style="
-                font-size: 56px;
-                font-weight: 900;
-                color: #FF4B4B;
-                margin: 0;
-                text-align: center;
-            ">
-                {minutes:02d}:{seconds:02d}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Auto-submit when time runs out
-        if remaining <= 0:
-            st.session_state.submitted = True
-            st.session_state.exam_started = False
-            st.warning("⏰ Time’s up! Submitting your answers...")
-            st.rerun()
-
-# Auto-refresh every second for live countdown
-st_autorefresh(interval=1000, key="timer_refresh")
-
-# -------------------------------
 # If exam submitted: Show results
 # -------------------------------
 if st.session_state.submitted:
     st.warning("Exam is over. Review your results below.")
     st.header(f"🏆 Final Score: {st.session_state.correct_count} / {total_questions}")
+
 else:
     # -------------------------------
-    # Progress section
+    # Progress
     # -------------------------------
     answered_count = len(st.session_state.answered)
     progress = answered_count / total_questions if total_questions else 0
@@ -184,28 +128,26 @@ else:
     col_submit, col_prev, col_next = st.columns([2, 1, 1])
 
     with col_submit:
-        if not answered and st.button("✅ Submit this question", use_container_width=True):
+        if not answered and st.button("Submit this question", use_container_width=True):
             st.session_state.answered[current_index] = True
             correct = current_question["answer"]
             user_ans = st.session_state.answers[current_index]
 
             if multi:
-                correct_set = set(correct)
-                user_set = set(user_ans)
-                if user_set == correct_set:
-                    st.success(f"✅ Correct! — {', '.join(correct)}")
+                if set(user_ans) == set(correct):
+                    st.success(f"Correct! — {', '.join(correct)}")
                     st.session_state.correct_count += 1
                 else:
-                    st.error("❌ Incorrect.")
+                    st.error("Incorrect.")
                     st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
-                    st.info(f"💡 Correct answer: **{', '.join(correct)}**")
+                    st.info(f"Correct answer: **{', '.join(correct)}**")
             else:
                 if user_ans == correct:
-                    st.success(f"✅ Correct! — {correct}")
+                    st.success(f"Correct! — {correct}")
                     st.session_state.correct_count += 1
                 else:
-                    st.error(f"❌ Incorrect. Your answer: **{user_ans}**")
-                    st.info(f"💡 Correct answer: **{correct}**")
+                    st.error(f"Incorrect. Your answer: **{user_ans}**")
+                    st.info(f"Correct answer: **{correct}**")
 
             if "explanation" in current_question and current_question["explanation"]:
                 st.markdown(f"**Explanation:** {current_question['explanation']}")
@@ -231,39 +173,37 @@ else:
 
         if multi:
             if set(user_ans) == set(correct):
-                st.success(f"✅ Correct! — {', '.join(correct)}")
+                st.success(f"Correct! — {', '.join(correct)}")
             else:
-                st.error("❌ Incorrect.")
+                st.error("Incorrect.")
                 st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
-                st.info(f"💡 Correct answer: **{', '.join(correct)}**")
+                st.info(f"Correct answer: **{', '.join(correct)}**")
         else:
             if user_ans == correct:
-                st.success(f"✅ Correct! — {correct}")
+                st.success(f"Correct! — {correct}")
             else:
-                st.error(f"❌ Incorrect. Your answer: **{user_ans}**")
-                st.info(f"💡 Correct answer: **{correct}**")
+                st.error(f"Incorrect. Your answer: **{user_ans}**")
+                st.info(f"Correct answer: **{correct}**")
 
         if "explanation" in current_question and current_question["explanation"]:
             st.markdown(f"**Explanation:** {current_question['explanation']}")
 
     # -------------------------------
-    # Show Finish Button if all answered
+    # Finish button
     # -------------------------------
     if answered_count == total_questions:
         st.markdown("---")
-        if st.button("🏁 Finish Quiz", use_container_width=True):
+        if st.button("Finish Quiz", use_container_width=True):
             st.session_state.submitted = True
-            st.session_state.exam_started = False
             st.rerun()
 
 # -------------------------------
-# Final Results Section
+# Final Results
 # -------------------------------
 if st.session_state.submitted:
     st.divider()
     st.header("🎯 Final Quiz Results")
 
-    score = st.session_state.correct_count
     for i, q in enumerate(st.session_state.quiz):
         multi_i = is_multi_answer(q)
         user_ans = st.session_state.answers.get(i, [] if multi_i else "Not answered")
@@ -272,20 +212,18 @@ if st.session_state.submitted:
         is_correct = set(user_ans) == set(correct) if multi_i else (user_ans == correct)
 
         if is_correct:
-            st.success(f"✅ Q{i+1}. {q['question']}")
+            st.success(f"Q{i+1}. {q['question']}")
         else:
-            st.error(f"❌ Q{i+1}. {q['question']}")
+            st.error(f"Q{i+1}. {q['question']}")
 
         if multi_i:
-            ua_disp = ", ".join(user_ans) if user_ans else "None"
-            ca_disp = ", ".join(correct)
-            st.markdown(f"Your answer: **{ua_disp}**")
-            st.markdown(f"Correct answer: **{ca_disp}**")
+            st.markdown(f"Your answer: **{', '.join(user_ans) if user_ans else 'None'}**")
+            st.markdown(f"Correct answer: **{', '.join(correct)}**")
         else:
             st.markdown(f"Your answer: **{user_ans}**")
             st.markdown(f"Correct answer: **{correct}**")
 
         if "explanation" in q and q["explanation"]:
-            st.info(f"💡 {q['explanation']}")
+            st.info(f"{q['explanation']}")
 
         st.markdown("---")
